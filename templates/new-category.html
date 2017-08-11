@@ -1,0 +1,24 @@
+{% extends "main.html" %}
+{% block content %}
+<div class="row justify-content-md-center m-5">
+  <div class="col col-lg-6">
+      <h2>New Category</h2>
+      <hr>
+      <form action='{{url_for('newCategory')}}'
+                      method = 'POST'>
+        <div class="form-group">
+          <label for="exampleInputEmail1">Name</label>
+          <input class="form-control" id="exampleInputEmail1"
+                aria-describedby="emailHelp"
+                placeholder='Add a sweet sport'
+                name = 'name'>
+        </div>
+        <button type="submit" value='Edit' class="btn btn-primary">Save</button>
+        <a href='{{url_for('showCatalog')}}'
+            class="btn btn-secondary">Cancel
+        </a>
+      </form>
+  </div>
+</div>
+
+{% endblock %}

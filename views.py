@@ -74,25 +74,121 @@ def gdisconnect():
 @app.route('/catalog/')
 def showCatalog():
     categories = session.query(Category).order_by(asc(Category.name))
+    products = session.query(Product).order_by(asc(Product.name))
+
     # if 'username' not in login_session:
     #     return render_template('public-mitt-coats.html'), categories=categories)
     # else
     #     return render_template('mitt-coats.html'), categories=categories)
-    return render_template('mitt-coats.html', categories=categories)
+    return render_template('mitt-coats.html',
+                            categories=categories,
+                            products=products)
 
 # Category route and view
+@app.route('/category/<string:category_name>/products')
+def showCategory(category_name):
+    category = session.query(Category).filter_by(
+                name=category_name).one()
+    products = session.query(Product).filter_by(
+                category_id=category.id).all()
+    return render_template('category.html',
+                            category=category,
+                            products=products)
+
+# Category new route and view
+@app.route('/category/new', methods=['GET', 'POST'])
+def newCategory():
+    if request.method == 'POST':
+        newCategory = Category(name=request.form['name'])
+        session.add(newCategory)
+        session.commit()
+        flash('New Category - %s - Added' % newCategory.name)
+        return redirect(url_for('showCatalog'))
+    else:
+        return render_template('new-category.html')
 
 # Category edit route and view
+@app.route('/category/<int:category_id>/edit',
+            methods=['GET', 'POST'])
+def editCategory(category_id):
+    editedCategory = session.query(Category).filter_by(id=category_id).one()
+    if request.method == 'POST':
+        if request.form['name']:
+            editedCategory.name = request.form['name']
+        session.add(editedCategory)
+        session.commit()
+        flash('Category Updated %s' % editedCategory.name)
+        return redirect(url_for('showCatalog'))
 
-# Category new rouate and view
+    else:
+        return render_template ('edit-category.html',
+                            category=editedCategory)
+
+# Category delete route and view
+@app.route('/category/<int:category_id>/delete', methods=['GET', 'POST'])
+def deleteCategory(category_id):
+    categoryToDelete = session.query(Category).filter_by(id=category_id).one()
+    if request.method == 'POST':
+        session.delete(categoryToDelete)
+        session.commit()
+        flash('%s Category Delete' % categoryToDelete.name)
+        return redirect(url_for('showCatalog'))
+    else:
+        return render_template('delete-category.html', category=categoryToDelete)
+
+
 
 # Product route and view
+@app.route('/category/<string:category_name>/<string:product_name>')
+def showProduct(product_name, category_name):
+    product = session.query(Product).filter_by(name=product_name).one()
+    return render_template('product.html', product=product)
 
 # Product new route and view
+@app.route('/product/new', methods=['GET', 'POST'])
+def newProduct():
+    categories = session.query(Category).order_by(asc(Category.name))
+    if request.method == 'POST':
+        newProduct = Product(name=request.form['name'],
+                             description=request.form['description'],
+                             price=request.form['price'],
+                             category_id=request.form['category_id'])
+        session.add(newProduct)
+        session.commit()
+        flash('New Product - %s - Added' % newProduct.name)
+        return redirect(url_for('showCatalog'))
+    else:
+        return render_template('new-product.html', categories=categories)
 
 # Product edit route and view
+@app.route('/category/<string:category_name>/<string:product_name>',
+            methods=['GET', 'POST'])
+def editProduct(product_name, category_name):
+    editedProduct = session.query(Product).filter_by(id=product_id).one()
+    if request.method == 'POST':
+        if request.form['name']:
+            editedProduct.name = request.form['name']
+        session.add(editedProduct)
+        session.commit()
+        flash('Product Updated %s' % editedCategory.name)
+        return redirect(url_for('showCatalog'))
+    else:
+        return render_template ('edit-product.html',
+                            product=editedCategory)
 
 # Product delete route and view
+@app.route('/category/<string:category_name>/<int:product_id>/delete',
+    methods=['GET', 'POST'])
+def deleteProduct(product_id, category_name):
+    productToDelete = session.query(Product).filter_by(id=product_id).one()
+    if request.method == 'POST':
+        session.delete(productToDelete)
+        session.commit()
+        flash('%s Product Delete' % productToDelete.name)
+        return redirect(url_for('showCatalog'))
+    else:
+        return render_template('delete-product.html', product=productToDelete)
+
 
 # Get User
 def getUserInfo(user_id):

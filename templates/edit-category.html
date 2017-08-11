@@ -1,0 +1,25 @@
+{% extends "main.html" %}
+{% block content %}
+<div class="row justify-content-md-center m-5">
+  <div class="col col-lg-6">
+      <h2>Edit Category</h2>
+      <hr>
+      <form action='{{url_for('editCategory',
+                      category_id = category.id)}}'
+                      method = 'POST'>
+        <div class="form-group">
+          <label for="exampleInputEmail1">Name</label>
+          <input class="form-control" id="exampleInputEmail1"
+                aria-describedby="emailHelp" name = 'name'
+                placeholder='{{ category.name }}'>
+        </div>
+        <button type="submit" value='Edit' class="btn btn-primary">Save</button>
+        <a href='{{url_for('showCategory', category_name=category_name)}}'
+            class="btn btn-secondary">Cancel
+        </a>
+      </form>
+  </div>
+</div>
+
+
+{% endblock %}

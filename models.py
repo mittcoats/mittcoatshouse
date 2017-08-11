@@ -60,7 +60,7 @@ class Category(Base):
             'id': self.id,
         }
 
-# Item Model
+# Product Model
 class Product(Base):
     __tablename__ = 'product'
 

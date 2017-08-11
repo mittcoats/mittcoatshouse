@@ -5,18 +5,39 @@
           href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css"
           integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ"
           crossorigin="anonymous">
-		<link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">
+		<link rel=stylesheet type=text/css
+					href="{{ url_for('static', filename='styles.css') }}">
 	</head>
 	<body>
-		<div class="container-fluid">
 
-      {% include "header.html" %}
+		<!-- Header -->
+		{% include "header.html" %}
 
+		<div id="main-container" class="container-fluid mp-5">
+
+			<!-- Flash messages -->
+				<span class="p-2">
+					{% with messages = get_flashed_messages() %}
+						{% if messages %}
+						<div class="alert alert-warning" role="alert">
+							<ul class="list-unstyled m-0">
+								{% for message in messages %}
+								<li class="">{{ message }}</li>
+								{% endfor %}
+							</ul>
+						</div>
+						{% endif %}
+					{% endwith %}
+				</span>
+
+			<!-- Render Main Content -->
       {% block content %}
       {% endblock %}
 
-      {% include "footer.html" %}
-
 		</div>
+
+		<!-- Footer -->
+		{% include "footer.html" %}
+
 	</body>
 </html>

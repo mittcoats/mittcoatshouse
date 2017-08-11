@@ -2,16 +2,13 @@
 {% block content %}
 <div class="row justify-content-md-center m-5">
   <div class="col col-lg-6">
-      <h2>Delete Product</h2>
+      <h2>Delete Category</h2>
       <hr>
-      <form action='{{url_for('deleteProduct',
-                      product_id=product.id,
-                      category_name=product.category.name)}}'
+      <form action='{{url_for('deleteCategory',
+                      category_id=category.id)}}'
                       method = 'POST'>
         <p>Are you sure you want to delete the
-          <strong>{{product.name}}</strong>
-          product in the
-          <strong>{{product.category.name}}</strong>
+          <strong>{{category.name}}</strong>
           category?
         </p>
         <button type="submit" value='Delete' class="btn btn-primary">Delete</button>
