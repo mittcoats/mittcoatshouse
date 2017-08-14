@@ -91,14 +91,16 @@ def showCatalog():
                             products=products)
 
 # Category route and view
-@app.route('/category/<string:category_name>/products')
+@app.route('/category/<string:category_name>/products/')
 def showCategory(category_name):
     category = session.query(Category).filter_by(
                 name=category_name).one()
     products = session.query(Product).filter_by(
                 category_id=category.id).all()
+    categories = session.query(Category).order_by(asc(Category.name))
     return render_template('category.html',
                             category=category,
+                            categories=categories,
                             products=products)
 
 # Category new route and view
@@ -114,7 +116,7 @@ def newCategory():
         return render_template('new-category.html')
 
 # Category edit route and view
-@app.route('/category/<int:category_id>/edit',
+@app.route('/category/<int:category_id>/edit/',
             methods=['GET', 'POST'])
 def editCategory(category_id):
     editedCategory = session.query(Category).filter_by(id=category_id).one()
@@ -131,7 +133,7 @@ def editCategory(category_id):
                             category=editedCategory)
 
 # Category delete route and view
-@app.route('/category/<int:category_id>/delete', methods=['GET', 'POST'])
+@app.route('/category/<int:category_id>/delete/', methods=['GET', 'POST'])
 def deleteCategory(category_id):
     categoryToDelete = session.query(Category).filter_by(id=category_id).one()
     if request.method == 'POST':
@@ -145,9 +147,9 @@ def deleteCategory(category_id):
 
 
 # Product route and view
-@app.route('/category/<string:category_name>/<string:product_name>')
-def showProduct(product_name, category_name):
-    product = session.query(Product).filter_by(name=product_name).one()
+@app.route('/category/<string:category_name>/<string:product_name>-<int:product_id>/')
+def showProduct(product_id, product_name, category_name):
+    product = session.query(Product).filter_by(id=product_id).one()
     return render_template('product.html', product=product)
 
 # Product new route and view
@@ -167,7 +169,9 @@ def newProduct():
         return render_template('new-product.html', categories=categories)
 
 # Product edit route and view
-@app.route('/category/<string:category_name>/<string:product_name>-id=<int:product_id>/edit',
+# @app.route('/category//-<int:product_id>/edit/', defaults={'product_name': 'foo', 'category_name': 'bar'}, methods=['GET', 'POST'])
+# @app.route('/category//<string:product_name>-<int:product_id>/edit/', defaults={'category_name': 'bar'}, methods=['GET', 'POST'])
+@app.route('/category/<string:category_name>/<string:product_name>-<int:product_id>/edit/',
             methods=['GET', 'POST'])
 def editProduct(product_id, product_name, category_name):
     categories = session.query(Category).order_by(asc(Category.name))
@@ -191,7 +195,7 @@ def editProduct(product_id, product_name, category_name):
                                 categories=categories)
 
 # Product delete route and view
-@app.route('/category/<string:category_name>/<int:product_id>/delete',
+@app.route('/category/<string:category_name>/<int:product_id>/delete/',
     methods=['GET', 'POST'])
 def deleteProduct(product_id, category_name):
     productToDelete = session.query(Product).filter_by(id=product_id).one()

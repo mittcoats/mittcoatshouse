@@ -7,7 +7,7 @@
       <form action='{{url_for('editProduct',
                       product_id = product.id,
                       product_name = product.name,
-                      category_name = product.category.name)}}'
+                      category_name = product.name)}}'
                       method = 'POST'>
         <div class="form-group">
           <label for="exampleInputEmail1">Name</label>
@@ -32,10 +32,14 @@
         <div class="form-group">
           <label for="exampleSelect1">Categories</label>
           <select class="form-control" id="exampleSelect1"
-                  placeholder='{{product.category.name}}'
                   name = 'category_id'>
             {% for category in categories %}
-              <option value = '{{category.name}}'>{{ category.name }}</option>
+              <option value = '{{category.id}}'
+                      {% if category.id == product.category.id %}
+                        selected
+                      {% endif %}>
+                      {{ category.name }}
+              </option>
             {% endfor %}
           </select>
         </div>

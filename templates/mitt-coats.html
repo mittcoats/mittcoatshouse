@@ -42,9 +42,9 @@
       {% for product in products %}
       <li class="list-group-item m-1">
         <a href='{{url_for('showProduct',
-                  category_name = product.category.name,
+                  product_id = product.id,
                   product_name = product.name,
-                  product_id = product.id)}}'>
+                  category_name = product.category.name)}}'>
                   {{ product.name }}
                   <span><em>({{ product.category.name }})</em></span>
         </a>

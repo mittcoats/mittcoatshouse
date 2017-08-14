@@ -1,2 +1,70 @@
-<h2>Category</h2>
-<h2>{{category.name}}</h2>
+{% extends "main.html" %}
+{% block content %}
+
+<div class="row m-5">
+  <div class="col-3">
+    <h3>Categories</h3>
+    <hr>
+      <a href='{{url_for('newCategory')}}' class="btn btn-outline-primary btn-sm">
+        New Category
+      </a>
+    <hr>
+    <ul class="list-group">
+      {% for category in categories %}
+      <li class="list-group-item m-1">
+        <a href='{{url_for('showCategory',
+                  category_name = category.name,
+                  category_id = category.id)}}'>
+                  {{ category.name }}
+        </a>
+        <!-- <div class="d-flex justify-content-end">
+          <small class="p-1"><em><a href='{{url_for('editCategory',
+                    category_id = category.id)}}'>
+                    edit
+          </a></em></small>
+          <small class="p-1"><em><a href='{{url_for('deleteCategory',
+                    category_id = category.id)}}'>
+                    delete
+          </a></em></small>
+        </div> -->
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="col">
+    <h3>{{ category.name|capitalize }} Products ({{products|length}})</h3>
+    <hr>
+      <a href='{{url_for('newProduct')}}' class="btn btn-outline-primary btn-sm">
+        New Product
+      </a>
+    <hr>
+    <ul class="list-group">
+      {% for product in products %}
+      <li class="list-group-item m-1">
+        <a href='{{url_for('showProduct',
+                  product_id = product.id,
+                  product_name = product.name,
+                  category_name = product.category.name)}}'>
+                  {{ product.name }}
+                  <span><em>({{ product.category.name }})</em></span>
+        </a>
+        <div class="d-flex justify-content-end">
+          <small class="p-1"><em><a href='{{url_for('editProduct',
+                    product_id = product.id,
+                    product_name = product.name,
+                    category_name = product.category.name)}}'>
+                    edit
+          </a></em></small>
+          <small class="p-1"><em><a href='{{url_for('deleteProduct',
+                    product_id = product.id,
+                    category_name = product.category.name)}}'>
+                    delete
+          </a></em></small>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+
+{% endblock %}
