@@ -51,14 +51,23 @@ class Category(Base):
     name = Column(String(250), nullable=False)
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
+    products = relationship("Product", lazy='joined')
 
     @property
     def serialize(self):
-        """Return object data in easily serializeable format"""
+        """Return object data in serializeable format"""
         return {
             'name': self.name,
             'id': self.id,
+            'user': self.user,
+            # 'products': self.serialize_products
         }
+
+    # TODO add products to category serialization
+    # @property
+    # def serialize_products(self):
+    #     """Return products data in serializeable format"""
+    #     return [ p.serialize for p in self.products ]
 
 # Product Model
 class Product(Base):
@@ -77,9 +86,10 @@ class Product(Base):
     def serialize(self):
         """Return object data in easily serializeable format"""
         return {
+            'id': self.id,
             'name': self.name,
             'description': self.description,
-            'id': self.id,
+            'category': self.category,
             'price': self.price,
         }
 

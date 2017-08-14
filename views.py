@@ -35,9 +35,11 @@ def log_request_info():
     app.logger.debug('Form: %s', request.form)
 
 # JSON API Endpoint - Catalog
-@app.route('/catalog/JSON')
+@app.route('/catalog/JSON/')
 def catalogJSON():
-    return true
+    categories = session.query(Category).all()
+    return jsonify(categories=[ c.serialize for c in categories ])
+
 
 # JSON API Endpoint - Category
 @app.route('/category/<int:category_id>/JSON')
@@ -46,7 +48,7 @@ def categoryJSON(category_id):
 
 # JSON API Endpoint - Item
 @app.route('/category/<int:category_id>/product/<int:product_id>/JSON')
-def productJSON():
+def productJSON(category_id, product_id):
     return true
 
 # JSON API Endpoint - User
