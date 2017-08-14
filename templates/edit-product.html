@@ -2,36 +2,49 @@
 {% block content %}
 <div class="row justify-content-md-center m-5">
   <div class="col col-lg-6">
-    <div class="row justify-content-md-center m-5">
-      <div class="col col-lg-6">
-          <h2>Edit Product</h2>
-          <hr>
-          <form action='{{url_for('newProduct')}}'
-                          method = 'POST'>
-            <div class="form-group">
-              <label for="exampleInputEmail1">{{product.name}}</label>
-              <input class="form-control" id="exampleInputEmail1"
-                    aria-describedby="emailHelp" name = 'name'
-                    placeholder='{{product.name}}'>
-            </div>
-            <div class="form-group">
-              <label for="exampleSelect1">Categories</label>
-              <select class="form-control" id="exampleSelect1">
-                {% for category in categories %}
-                  <option category_id = '{{category.id}}'>{{ category.name }}</option>
-                {% endfor %}
-              </select>
-            </div>
-            <button type="submit" value='Edit' class="btn btn-primary">Save</button>
-            <a href='{{url_for('showCatalog')}}'
-                class="btn btn-secondary">Cancel
-            </a>
-          </form>
-      </div>
-    </div>
-
+      <h2>New Product</h2>
+      <hr>
+      <form action='{{url_for('editProduct',
+                      product_id = product.id,
+                      product_name = product.name,
+                      category_name = product.category.name)}}'
+                      method = 'POST'>
+        <div class="form-group">
+          <label for="exampleInputEmail1">Name</label>
+          <input class="form-control" id="exampleInputEmail1"
+                  aria-describedby="emailHelp"
+                  value='{{product.name}}'
+                  name = 'name'>
+        </div>
+        <div class="form-group">
+          <label for="exampleTextarea">Description</label>
+          <textarea class="form-control" id="exampleTextarea" rows="3"
+                    name = 'description'>{{product.description}}
+          </textarea>
+        </div>
+        <div class="form-group">
+          <label for="exampleInputEmail1">Price</label>
+          <input class="form-control" id="exampleInputEmail1"
+                  aria-describedby="emailHelp"
+                  value='{{product.price}}'
+                  name = 'price'>
+        </div>
+        <div class="form-group">
+          <label for="exampleSelect1">Categories</label>
+          <select class="form-control" id="exampleSelect1"
+                  placeholder='{{product.category.name}}'
+                  name = 'category_id'>
+            {% for category in categories %}
+              <option value = '{{category.name}}'>{{ category.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button type="submit" value='Edit' class="btn btn-primary">Save</button>
+        <a href='{{url_for('showCatalog')}}'
+            class="btn btn-secondary">Cancel
+        </a>
+      </form>
   </div>
 </div>
-
 
 {% endblock %}

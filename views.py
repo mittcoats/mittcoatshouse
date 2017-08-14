@@ -27,6 +27,12 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
+# Server Debugger
+@app.before_request
+def log_request_info():
+    # app.logger.debug('Headers: %s', request.headers)
+    # app.logger.debug('Body: %s', request.get_data())
+    app.logger.debug('Form: %s', request.form)
 
 # JSON API Endpoint - Catalog
 @app.route('/catalog/JSON')
@@ -161,20 +167,28 @@ def newProduct():
         return render_template('new-product.html', categories=categories)
 
 # Product edit route and view
-@app.route('/category/<string:category_name>/<string:product_name>',
+@app.route('/category/<string:category_name>/<string:product_name>-id=<int:product_id>/edit',
             methods=['GET', 'POST'])
-def editProduct(product_name, category_name):
+def editProduct(product_id, product_name, category_name):
+    categories = session.query(Category).order_by(asc(Category.name))
     editedProduct = session.query(Product).filter_by(id=product_id).one()
     if request.method == 'POST':
         if request.form['name']:
             editedProduct.name = request.form['name']
+        if request.form['description']:
+            editedProduct.description = request.form['description']
+        if request.form['price']:
+            editedProduct.price = request.form['price']
+        if request.form['category_id']:
+            editedProduct.category_id = request.form['category_id']
         session.add(editedProduct)
         session.commit()
-        flash('Product Updated %s' % editedCategory.name)
+        flash('Product Updated %s' % editedProduct.name)
         return redirect(url_for('showCatalog'))
     else:
         return render_template ('edit-product.html',
-                            product=editedCategory)
+                                product=editedProduct,
+                                categories=categories)
 
 # Product delete route and view
 @app.route('/category/<string:category_name>/<int:product_id>/delete',

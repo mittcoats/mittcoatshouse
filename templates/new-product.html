@@ -32,7 +32,7 @@
           <select class="form-control" id="exampleSelect1"
                   name = 'category_id'>
             {% for category in categories %}
-              <option value = '{{category.name}}'>{{ category.name }}</option>
+              <option value = '{{category.id}}'>{{ category.name }}{{category.id}}</option>
             {% endfor %}
           </select>
         </div>

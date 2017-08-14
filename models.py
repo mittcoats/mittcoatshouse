@@ -68,7 +68,7 @@ class Product(Base):
     name = Column(String(80), nullable=False)
     description = Column(String(250))
     price = Column(String(8))
-    category_id = Column(Integer, ForeignKey('category.id'))
+    category_id = Column(Integer, ForeignKey('category.id'), nullable=False)
     category = relationship(Category)
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
