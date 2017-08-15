@@ -48,11 +48,11 @@ def log_request_info():
 # Get Logged In User
 @app.before_request
 def load_user():
-    if login_session['user_id']:
+    if 'user_id' in login_session:
         user_id = login_session['user_id']
         user = session.query(User).filter_by(id=user_id).one()
     else:
-        user = {"name": "Guest"}
+        user = {}
 
     g.user = user
 
@@ -203,7 +203,8 @@ def gdisconnect():
         response = make_response(json
                                  .dumps('Current user not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
-        return response
+        print response
+        return redirect(url_for('showCatalog'))
 
     print 'In gdisconnect access token is %s', access_token
     print 'User name is: '
@@ -221,15 +222,18 @@ def gdisconnect():
         del login_session['username']
         del login_session['email']
         del login_session['picture']
+        del login_session['user_id']
     	response = make_response(json.dumps('Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         print response
+        flash("Successfully logged out")
         return redirect(url_for('showCatalog'))
     else:
         response = make_response(
                    json.dumps('Failed to revoke token for given user.', 400))
         response.headers['Content-Type'] = 'application/json'
-        return response
+        print response
+        return redirect(url_for('showCatalog'))
 
 # Facebook Oauth
 
