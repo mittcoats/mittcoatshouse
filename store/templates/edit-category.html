@@ -13,6 +13,21 @@
                 aria-describedby="emailHelp" name = 'name'
                 placeholder='{{ category.name }}'>
         </div>
+        <div class="form-group">
+          <label for="exampleSelect1">Owner</label>
+          <select class="form-control" id="exampleSelect1"
+                  name = 'user_id'>
+            {% for user in users %}
+              <option value = '{{user.id}}'
+                      {% if user.id == category.user_id %}
+                        selected
+                      {% endif %}>
+                      {{ user.username }},
+                      {{ user.email }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
         <button type="submit" value='Edit' class="btn btn-primary">Save</button>
         <a href='{{url_for('showCategory', category_name=category_name)}}'
             class="btn btn-secondary">Cancel

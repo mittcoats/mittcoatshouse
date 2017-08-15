@@ -45,7 +45,7 @@ def log_request_info():
     app.logger.debug('Form: %s', request.form)
 
 
-# Get Logged In User
+# Get logged in user and make available on flask global "g"
 @app.before_request
 def load_user():
     if 'user_id' in login_session:
@@ -59,7 +59,7 @@ def load_user():
 # ======= User Helpers =======
 
 
-# New User
+# Create New User if user in login_session doesn't exist
 def createUser(login_session):
     newUser = User(username=login_session['username'],
                    email=login_session['email'],
@@ -87,9 +87,10 @@ def getUserID(email):
 
 # ======= Auth routes =======
 
-# Create anti-forgery state token
+
 @app.route('/login/')
 def showLogin():
+    # Create anti-forgery state token
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
     login_session['state'] = state
@@ -275,8 +276,12 @@ def showCategory(category_name):
 # Category new route and view
 @app.route('/category/new', methods=['GET', 'POST'])
 def newCategory():
+    if 'username' not in login_session:
+        return redirect('/login')
+
     if request.method == 'POST':
-        newCategory = Category(name=request.form['name'])
+        newCategory = Category(name=request.form['name'],
+                               user_id=request.args['user_id'])
         session.add(newCategory)
         session.commit()
         flash('New Category - %s - Added' % newCategory.name)
@@ -289,10 +294,16 @@ def newCategory():
 @app.route('/category/<int:category_id>/edit/',
            methods=['GET', 'POST'])
 def editCategory(category_id):
+    if 'username' not in login_session:
+        return redirect('/login')
+
     editedCategory = session.query(Category).filter_by(id=category_id).one()
+    users = session.query(User).order_by(asc(User.username))
     if request.method == 'POST':
         if request.form['name']:
             editedCategory.name = request.form['name']
+        if request.form['user_id']:
+            editedCategory.user_id = request.form['user_id']
         session.add(editedCategory)
         session.commit()
         flash('Category Updated %s' % editedCategory.name)
@@ -300,12 +311,16 @@ def editCategory(category_id):
 
     else:
         return render_template('edit-category.html',
-                               category=editedCategory)
+                               category=editedCategory,
+                               users=users)
 
 
 # Category delete route and view
 @app.route('/category/<int:category_id>/delete/', methods=['GET', 'POST'])
 def deleteCategory(category_id):
+    if 'username' not in login_session:
+        return redirect('/login')
+
     categoryToDelete = session.query(Category).filter_by(id=category_id).one()
     if request.method == 'POST':
         session.delete(categoryToDelete)
@@ -327,6 +342,9 @@ def showProduct(product_id, product_name, category_name):
 # Product new route and view
 @app.route('/product/new', methods=['GET', 'POST'])
 def newProduct():
+    if 'username' not in login_session:
+        return redirect('/login')
+
     categories = session.query(Category).order_by(asc(Category.name))
     if request.method == 'POST':
         newProduct = Product(name=request.form['name'],
@@ -345,6 +363,9 @@ def newProduct():
 @app.route('/category/<string:category_name>/<string:product_name>/edit/',
            methods=['GET', 'POST'])
 def editProduct(product_name, category_name):
+    if 'username' not in login_session:
+        return redirect('/login')
+
     product_id = request.args.get('product_id')
     user_id = request.args.get('user_id')
     categories = session.query(Category).order_by(asc(Category.name))

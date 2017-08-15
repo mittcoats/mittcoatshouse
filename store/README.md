@@ -45,8 +45,8 @@ Once it is up and running, type **vagrant ssh**. This will log your terminal int
 
 Now that you have Vagrant up and running type **vagrant ssh** to log into your VM.  change to the /vagrant directory by typing **cd /vagrant**. This will take you to the shared folder between your virtual machine and host machine.
 
-Type **ls** to ensure that you are inside the directory that contains project.py, database_setup.py, and two directories named 'templates' and 'static'
+Type **ls** to ensure that you are inside the directory that contains project.py, models.py, and two directories named 'templates' and 'static'
 
 Now type **python models.py** to initialize the database.
 
-Type **python views.py** to run the Flask web server. In your browser visit **http://localhost:5000** to view the restaurant menu app.  You should be able to view, add, edit, and delete menu items and restaurants.
+Type **python views.py** to run the Flask web server. In your browser visit **http://localhost:5000** to view the store app.  You should be able to view, add, edit, and delete products and categories.

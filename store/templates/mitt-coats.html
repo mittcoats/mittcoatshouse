@@ -2,7 +2,7 @@
 {% block content %}
 
 <div class="row m-5">
-  <div class="col">
+  <div class="col-6">
     <h3>Categories</h3>
     <hr>
       {% if user %}
@@ -17,9 +17,15 @@
         <a href='{{url_for('showCategory',
                   category_name = category.name,
                   category_id = category.id)}}'>
-                  {{ category.name }}
+                  <h4>{{ category.name }}</h4>
+
         </a>
-        {% if user %}
+        <div class="ml-auto">
+          <small class="text-muted">
+            <em>{{ category.user.email }}</em>
+          </small>
+        </div>
+        {% if user.id == category.user_id %}
           <span class="oi oi-pencil ml-4"></span>
           <div class="d-flex justify-content-end">
             <small class="p-1"><em><a href='{{url_for('editCategory',
@@ -32,6 +38,7 @@
             </a></em></small>
           </div>
         {% endif %}
+
       </li>
       {% endfor %}
     </ul>
@@ -54,11 +61,15 @@
                   product_name = product.name,
                   category_name = product.category.name,
                   user_id = product.user_id)}}'>
-                  {{ product.name }} -
-                  {{ product.user_id }}
+                  <h5>{{ product.name }}</h5>
                   <span><em>({{ product.category.name }})</em></span>
         </a>
-        {% if user %}
+        <div class="ml-auto">
+          <small class="text-muted">
+            <em>{{ product.user.email }}</em>
+          </small>
+        </div>
+        {% if user.id == product.user_id %}
           <span class="oi oi-pencil ml-4"></span>
           <div class="d-flex justify-content-end">
             <small class="p-1"><em><a href='{{url_for('editProduct',

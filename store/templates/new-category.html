@@ -4,8 +4,9 @@
   <div class="col col-lg-6">
       <h2>New Category</h2>
       <hr>
-      <form action='{{url_for('newCategory')}}'
-                      method = 'POST'>
+      <form action='{{url_for('newCategory',
+                               user_id = g.user.id)}}'
+                               method = 'POST'>
         <div class="form-group">
           <label for="exampleInputEmail1">Name</label>
           <input class="form-control" id="exampleInputEmail1"
