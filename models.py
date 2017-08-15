@@ -1,13 +1,21 @@
-from sqlalchemy import Column,Integer,String, ForeignKey
+from sqlalchemy import Column
+from sqlalchemy import Integer
+from sqlalchemy import String
+from sqlalchemy import ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.orm import relationship
+from sqlalchemy import sessionmaker
 from sqlalchemy import create_engine
 from passlib.apps import custom_app_context as pwd_context
-import random, string
-from itsdangerous import(TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
+import random
+import string
+from itsdangerous import (TimedJSONWebSignatureSerializer as
+                          Serializer, BadSignature, SignatureExpired)
 
 Base = declarative_base()
-secret_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in xrange(32))
+secret_key = ''.join(random.choice(string.ascii_uppercase + string.digits)
+                     for x in xrange(32))
+
 
 # User Model
 class User(Base):
@@ -19,29 +27,40 @@ class User(Base):
     email = Column(String)
     password_hash = Column(String(64))
 
-    def hash_password(self, password):
-        self.password_hash = pwd_context.encrypt(password)
+    # def hash_password(self, password):
+    #     self.password_hash = pwd_context.encrypt(password)
+    #
+    # def verify_password(self, password):
+    #     return pwd_context.verify(password, self.password_hash)
+    #
+    # def generate_auth_token(self, expiration=600):
+    # 	s = Serializer(secret_key, expires_in=expiration)
+    # 	return s.dumps({'id': self.id })
+    #
+    # @staticmethod
+    # def verify_auth_token(token):
+    # 	s = Serializer(secret_key)
+    # 	try:
+    # 		data = s.loads(token)
+    # 	except SignatureExpired:
+    # 		#Valid Token, but expired
+    # 		return None
+    # 	except BadSignature:
+    # 		#Invalid Token
+    # 		return None
+    # 	user_id = data['id']
+    # 	return user_id
 
-    def verify_password(self, password):
-        return pwd_context.verify(password, self.password_hash)
+    @property
+    def serialize(self):
+        """Return object data in serializeable format"""
+        return {
+            'username': self.username,
+            'id': self.id,
+            'email': self.email,
+            'password': self.password_hash
+        }
 
-    def generate_auth_token(self, expiration=600):
-    	s = Serializer(secret_key, expires_in = expiration)
-    	return s.dumps({'id': self.id })
-
-    @staticmethod
-    def verify_auth_token(token):
-    	s = Serializer(secret_key)
-    	try:
-    		data = s.loads(token)
-    	except SignatureExpired:
-    		#Valid Token, but expired
-    		return None
-    	except BadSignature:
-    		#Invalid Token
-    		return None
-    	user_id = data['id']
-    	return user_id
 
 # Category Model
 class Category(Base):
@@ -69,6 +88,7 @@ class Category(Base):
     #     """Return products data in serializeable format"""
     #     return [ p.serialize for p in self.products ]
 
+
 # Product Model
 class Product(Base):
     __tablename__ = 'product'
@@ -89,13 +109,12 @@ class Product(Base):
             'id': self.id,
             'name': self.name,
             'description': self.description,
-            'category': self.category,
+            # 'category': self.category,
             'price': self.price,
+            'user_id': self.user_id
         }
 
 
-
 engine = create_engine('sqlite:///mittcoatshouse.db')
-
 
 Base.metadata.create_all(engine)

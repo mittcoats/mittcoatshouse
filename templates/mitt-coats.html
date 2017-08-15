@@ -5,10 +5,12 @@
   <div class="col">
     <h3>Categories</h3>
     <hr>
-      <a href='{{url_for('newCategory')}}' class="btn btn-outline-primary btn-sm">
-        New Category
-      </a>
-    <hr>
+      {% if user %}
+        <a href='{{url_for('newCategory')}}' class="btn btn-outline-primary btn-sm">
+          New Category
+        </a>
+        <hr>
+      {% endif %}
     <ul class="list-group">
       {% for category in categories %}
       <li class="list-group-item m-1">
@@ -17,16 +19,19 @@
                   category_id = category.id)}}'>
                   {{ category.name }}
         </a>
-        <div class="d-flex justify-content-end">
-          <small class="p-1"><em><a href='{{url_for('editCategory',
-                    category_id = category.id)}}'>
-                    edit
-          </a></em></small>
-          <small class="p-1"><em><a href='{{url_for('deleteCategory',
-                    category_id = category.id)}}'>
-                    delete
-          </a></em></small>
-        </div>
+        {% if user %}
+          <span class="oi oi-pencil ml-4"></span>
+          <div class="d-flex justify-content-end">
+            <small class="p-1"><em><a href='{{url_for('editCategory',
+                      category_id = category.id)}}'>
+                      edit
+            </a></em></small>
+            <small class="p-1"><em><a href='{{url_for('deleteCategory',
+                      category_id = category.id)}}'>
+                      delete
+            </a></em></small>
+          </div>
+        {% endif %}
       </li>
       {% endfor %}
     </ul>
@@ -34,33 +39,43 @@
   <div class="col">
     <h3>Products</h3>
     <hr>
-      <a href='{{url_for('newProduct')}}' class="btn btn-outline-primary btn-sm">
-        New Product
-      </a>
-    <hr>
+      {% if user %}
+        <a href='{{url_for('newProduct')}}' class="btn btn-outline-primary btn-sm">
+          New Product
+        </a>
+        <hr>
+      {% endif %}
+
     <ul class="list-group">
       {% for product in products %}
       <li class="list-group-item m-1">
         <a href='{{url_for('showProduct',
                   product_id = product.id,
                   product_name = product.name,
-                  category_name = product.category.name)}}'>
-                  {{ product.name }}
+                  category_name = product.category.name,
+                  user_id = product.user_id)}}'>
+                  {{ product.name }} -
+                  {{ product.user_id }}
                   <span><em>({{ product.category.name }})</em></span>
         </a>
-        <div class="d-flex justify-content-end">
-          <small class="p-1"><em><a href='{{url_for('editProduct',
-                    product_id = product.id,
-                    product_name = product.name,
-                    category_name = product.category.name)}}'>
-                    edit
-          </a></em></small>
-          <small class="p-1"><em><a href='{{url_for('deleteProduct',
-                    product_id = product.id,
-                    category_name = product.category.name)}}'>
-                    delete
-          </a></em></small>
-        </div>
+        {% if user %}
+          <span class="oi oi-pencil ml-4"></span>
+          <div class="d-flex justify-content-end">
+            <small class="p-1"><em><a href='{{url_for('editProduct',
+                      product_id = product.id,
+                      product_name = product.name,
+                      category_name = product.category.name,
+                      user_id = user.id)}}'>
+                      edit
+            </a></em></small>
+            <small class="p-1"><em><a href='{{url_for('deleteProduct',
+                      product_id = product.id,
+                      category_name = product.category.name,
+                      user_id = product.user_id)}}'>
+                      delete
+            </a></em></small>
+          </div>
+        {% endif %}
       </li>
       {% endfor %}
     </ul>
