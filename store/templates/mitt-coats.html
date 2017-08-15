@@ -6,8 +6,9 @@
     <h3>Categories</h3>
     <hr>
       {% if user %}
-        <a href='{{url_for('newCategory')}}' class="btn btn-outline-primary btn-sm">
-          New Category
+        <a href='{{url_for('newCategory')}}'
+           class="btn btn-outline-primary btn-sm">
+           New Category
         </a>
         <hr>
       {% endif %}
@@ -47,7 +48,8 @@
     <h3>Products</h3>
     <hr>
       {% if user %}
-        <a href='{{url_for('newProduct')}}' class="btn btn-outline-primary btn-sm">
+        <a href='{{url_for('newProduct')}}'
+           class="btn btn-outline-primary btn-sm">
           New Product
         </a>
         <hr>
