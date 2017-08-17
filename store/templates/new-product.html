@@ -4,7 +4,7 @@
   <div class="col col-lg-6">
       <h2>New Product</h2>
       <hr>
-      <form action='{{url_for('newProduct')}}'
+      <form action='{{url_for('newProduct', user_id = g.user.id )}}'
                       method = 'POST'>
         <div class="form-group">
           <label for="exampleInputEmail1">Name</label>
@@ -27,7 +27,7 @@
                   placeholder='How much?'
                   name = 'price'>
         </div>
-        <div class="form-group">
+        <!-- <div class="form-group">
           <label for="exampleSelect1">Owner</label>
           <select class="form-control" id="exampleSelect1"
                   name = 'user_id'>
@@ -40,15 +40,15 @@
               </option>
             {% endfor %}
           </select>
-        </div>
+        </div> -->
         <div class="form-group">
           <label for="exampleSelect1">Categories</label>
           <select class="form-control" id="exampleSelect1"
                   name = 'category_id'>
             {% for category in categories %}
               <option value = '{{category.id}}'>
-                {{ category.name }}{{category.id}
-              }</option>
+                {{ category.name }}
+              </option>
             {% endfor %}
           </select>
         </div>

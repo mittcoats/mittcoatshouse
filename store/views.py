@@ -7,6 +7,7 @@ from flask import url_for
 from flask import flash
 from flask import session as login_session
 from flask import make_response
+from functools import wraps
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
 from models import Base
@@ -45,6 +46,8 @@ def log_request_info():
     app.logger.debug('Form: %s', request.form)
 
 
+# ======= User Helpers =======
+
 # Get logged in user and make available on flask global "g"
 @app.before_request
 def load_user():
@@ -56,7 +59,16 @@ def load_user():
 
     g.user = user
 
-# ======= User Helpers =======
+# Check if user is logged in, otherwise redirect to login
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' in login_session:
+            return f(*args, **kwargs)
+        else:
+            flash("You are not authorized to access this area")
+            return redirect('/login')
+    return decorated_function
 
 
 # Create New User if user in login_session doesn't exist
@@ -233,6 +245,7 @@ def gdisconnect():
         response = make_response(
                    json.dumps('Failed to revoke token for given user.', 400))
         response.headers['Content-Type'] = 'application/json'
+        flash("Error logging out")
         print response
         return redirect(url_for('showCatalog'))
 
@@ -275,16 +288,14 @@ def showCategory(category_name):
 
 # Category new route and view
 @app.route('/category/new', methods=['GET', 'POST'])
+@login_required
 def newCategory():
-    if 'username' not in login_session:
-        return redirect('/login')
-
     if request.method == 'POST':
         newCategory = Category(name=request.form['name'],
                                user_id=request.args['user_id'])
         session.add(newCategory)
         session.commit()
-        flash('New Category - %s - Added' % newCategory.name)
+        flash('"%s" New Category Added' % newCategory.name)
         return redirect(url_for('showCatalog'))
     else:
         return render_template('new-category.html')
@@ -293,10 +304,8 @@ def newCategory():
 # Category edit route and view
 @app.route('/category/<int:category_id>/edit/',
            methods=['GET', 'POST'])
+@login_required
 def editCategory(category_id):
-    if 'username' not in login_session:
-        return redirect('/login')
-
     editedCategory = session.query(Category).filter_by(id=category_id).one()
     users = session.query(User).order_by(asc(User.username))
     if request.method == 'POST':
@@ -306,7 +315,7 @@ def editCategory(category_id):
             editedCategory.user_id = request.form['user_id']
         session.add(editedCategory)
         session.commit()
-        flash('Category Updated %s' % editedCategory.name)
+        flash('"%s" Category Updated' % editedCategory.name)
         return redirect(url_for('showCatalog'))
 
     else:
@@ -317,15 +326,13 @@ def editCategory(category_id):
 
 # Category delete route and view
 @app.route('/category/<int:category_id>/delete/', methods=['GET', 'POST'])
+@login_required
 def deleteCategory(category_id):
-    if 'username' not in login_session:
-        return redirect('/login')
-
     categoryToDelete = session.query(Category).filter_by(id=category_id).one()
     if request.method == 'POST':
         session.delete(categoryToDelete)
         session.commit()
-        flash('%s Category Delete' % categoryToDelete.name)
+        flash('"%s" Category Deleted' % categoryToDelete.name)
         return redirect(url_for('showCatalog'))
     else:
         return render_template('delete-category.html',
@@ -341,19 +348,18 @@ def showProduct(product_id, product_name, category_name):
 
 # Product new route and view
 @app.route('/product/new', methods=['GET', 'POST'])
+@login_required
 def newProduct():
-    if 'username' not in login_session:
-        return redirect('/login')
-
     categories = session.query(Category).order_by(asc(Category.name))
     if request.method == 'POST':
         newProduct = Product(name=request.form['name'],
                              description=request.form['description'],
                              price=request.form['price'],
-                             category_id=request.form['category_id'])
+                             category_id=request.form['category_id'],
+                             user_id=request.args['user_id'])
         session.add(newProduct)
         session.commit()
-        flash('New Product - %s - Added' % newProduct.name)
+        flash('"%s", New Product Added' % newProduct.name)
         return redirect(url_for('showCatalog'))
     else:
         return render_template('new-product.html', categories=categories)
@@ -362,10 +368,8 @@ def newProduct():
 # Product edit route and view
 @app.route('/category/<string:category_name>/<string:product_name>/edit/',
            methods=['GET', 'POST'])
+@login_required
 def editProduct(product_name, category_name):
-    if 'username' not in login_session:
-        return redirect('/login')
-
     product_id = request.args.get('product_id')
     user_id = request.args.get('user_id')
     categories = session.query(Category).order_by(asc(Category.name))
@@ -384,7 +388,7 @@ def editProduct(product_name, category_name):
             editedProduct.category_id = request.form['category_id']
         session.add(editedProduct)
         session.commit()
-        flash('Product Updated %s' % editedProduct.name)
+        flash('"%s", Product Updated' % editedProduct.name)
         return redirect(url_for('showCatalog'))
     else:
         return render_template('edit-product.html',
@@ -396,12 +400,9 @@ def editProduct(product_name, category_name):
 # Product delete route and view
 @app.route('/category/<string:category_name>/<int:product_id>/delete/',
            methods=['GET', 'POST'])
+@login_required
 def deleteProduct(product_id, category_name):
-    if 'username' not in login_session:
-        return redirect('/login')
-
     productToDelete = session.query(Product).filter_by(id=product_id).one()
-    owner = getUserInfo(productToDelete.user_id)
 
     if login_session['user_id'] != productToDelete.user_id:
         return '''
@@ -413,7 +414,7 @@ def deleteProduct(product_id, category_name):
     if request.method == 'POST':
         session.delete(productToDelete)
         session.commit()
-        flash('%s Product Deleted' % productToDelete.name)
+        flash('"%s" Product Deleted' % productToDelete.name)
         return redirect(url_for('showCatalog'))
     else:
         return render_template('delete-product.html', product=productToDelete)
