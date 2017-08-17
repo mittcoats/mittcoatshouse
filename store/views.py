@@ -45,8 +45,9 @@ def log_request_info():
     # app.logger.debug('Body: %s', request.get_data())
     app.logger.debug('Form: %s', request.form)
 
-
+# ============================
 # ======= User Helpers =======
+# ============================
 
 # Get logged in user and make available on flask global "g"
 @app.before_request
@@ -97,7 +98,9 @@ def getUserID(email):
         return None
 
 
-# ======= Auth routes =======
+# ============================
+# ======= Auth routes ========
+# ============================
 
 
 @app.route('/login/')
@@ -249,9 +252,11 @@ def gdisconnect():
         print response
         return redirect(url_for('showCatalog'))
 
-# Facebook Oauth
 
+
+# ==============================
 # ======= Catalog Routes =======
+# ==============================
 
 
 # Home route and view
@@ -442,7 +447,9 @@ def deleteProduct(product_name, category_name):
         return render_template('delete-product.html', product=productToDelete)
 
 
+# ==============================
 # ======= JSON Endpoints =======
+# ==============================
 
 
 # JSON API Endpoint - Catalog
