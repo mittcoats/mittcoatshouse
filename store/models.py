@@ -26,30 +26,6 @@ class User(Base):
     email = Column(String)
     password_hash = Column(String(64))
 
-    # def hash_password(self, password):
-    #     self.password_hash = pwd_context.encrypt(password)
-    #
-    # def verify_password(self, password):
-    #     return pwd_context.verify(password, self.password_hash)
-    #
-    # def generate_auth_token(self, expiration=600):
-    # 	s = Serializer(secret_key, expires_in=expiration)
-    # 	return s.dumps({'id': self.id })
-    #
-    # @staticmethod
-    # def verify_auth_token(token):
-    # 	s = Serializer(secret_key)
-    # 	try:
-    # 		data = s.loads(token)
-    # 	except SignatureExpired:
-    # 		#Valid Token, but expired
-    # 		return None
-    # 	except BadSignature:
-    # 		#Invalid Token
-    # 		return None
-    # 	user_id = data['id']
-    # 	return user_id
-
     @property
     def serialize(self):
         """Return object data in serializeable format"""
@@ -77,15 +53,15 @@ class Category(Base):
         return {
             'name': self.name,
             'id': self.id,
-            'user': self.user,
-            # 'products': self.serialize_products
+            'user': self.user_id,
+            'products': self.serialize_products
         }
 
-    # TODO add products to category serialization
-    # @property
-    # def serialize_products(self):
-    #     """Return products data in serializeable format"""
-    #     return [ p.serialize for p in self.products ]
+    # Add products to category serialization
+    @property
+    def serialize_products(self):
+        """Return products data in serializeable format"""
+        return [ p.serialize for p in self.products ]
 
 
 # Product Model
@@ -108,7 +84,7 @@ class Product(Base):
             'id': self.id,
             'name': self.name,
             'description': self.description,
-            # 'category': self.category,
+            'category': self.category.name,
             'price': self.price,
             'user_id': self.user_id
         }

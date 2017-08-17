@@ -6,6 +6,7 @@
       <hr>
       <form action='{{url_for('deleteProduct',
                       product_id=product.id,
+                      product_name=product.name,
                       category_name=product.category.name)}}'
                       method = 'POST'>
         <p>Are you sure you want to delete the

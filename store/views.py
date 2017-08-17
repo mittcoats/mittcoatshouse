@@ -66,7 +66,7 @@ def login_required(f):
         if 'username' in login_session:
             return f(*args, **kwargs)
         else:
-            flash("You are not authorized to access this area")
+            flash("Please login to access this function.")
             return redirect('/login')
     return decorated_function
 
@@ -293,10 +293,14 @@ def newCategory():
     if request.method == 'POST':
         newCategory = Category(name=request.form['name'],
                                user_id=request.args['user_id'])
-        session.add(newCategory)
-        session.commit()
-        flash('"%s" New Category Added' % newCategory.name)
-        return redirect(url_for('showCatalog'))
+        if newCategory.name == "":
+            flash("Silly, you can't add a blank category")
+            return redirect(url_for('newCategory'))
+        else:
+            session.add(newCategory)
+            session.commit()
+            flash('"%s" New Category Added' % newCategory.name)
+            return redirect(url_for('showCatalog'))
     else:
         return render_template('new-category.html')
 
@@ -308,6 +312,11 @@ def newCategory():
 def editCategory(category_id):
     editedCategory = session.query(Category).filter_by(id=category_id).one()
     users = session.query(User).order_by(asc(User.username))
+
+    if login_session['user_id'] != editedCategory.user_id:
+        flash("Oops, this resource is not yours to access!")
+        return redirect(url_for('showCatalog'))
+
     if request.method == 'POST':
         if request.form['name']:
             editedCategory.name = request.form['name']
@@ -329,6 +338,11 @@ def editCategory(category_id):
 @login_required
 def deleteCategory(category_id):
     categoryToDelete = session.query(Category).filter_by(id=category_id).one()
+
+    if login_session['user_id'] != categoryToDelete.user_id:
+        flash("Oops, this resource is not yours to access!")
+        return redirect(url_for('showCatalog'))
+
     if request.method == 'POST':
         session.delete(categoryToDelete)
         session.commit()
@@ -340,8 +354,9 @@ def deleteCategory(category_id):
 
 
 # Product route and view
-@app.route('/category/<string:category_name>/<string:product_name>-<int:product_id>/')
-def showProduct(product_id, product_name, category_name):
+@app.route('/category/<string:category_name>/<string:product_name>/')
+def showProduct(product_name, category_name):
+    product_id = request.args.get('product_id')
     product = session.query(Product).filter_by(id=product_id).one()
     return render_template('product.html', product=product)
 
@@ -357,10 +372,14 @@ def newProduct():
                              price=request.form['price'],
                              category_id=request.form['category_id'],
                              user_id=request.args['user_id'])
-        session.add(newProduct)
-        session.commit()
-        flash('"%s", New Product Added' % newProduct.name)
-        return redirect(url_for('showCatalog'))
+        if newProduct.name == "":
+            flash("Silly, you can't add a blank product")
+            return redirect(url_for('newProduct'))
+        else:
+            session.add(newProduct)
+            session.commit()
+            flash('"%s", New Product Added' % newProduct.name)
+            return redirect(url_for('showCatalog'))
     else:
         return render_template('new-product.html', categories=categories)
 
@@ -375,6 +394,11 @@ def editProduct(product_name, category_name):
     categories = session.query(Category).order_by(asc(Category.name))
     users = session.query(User).order_by(asc(User.username)).all()
     editedProduct = session.query(Product).filter_by(id=product_id).one()
+
+    if login_session['user_id'] != editedProduct.user_id:
+        flash("Oops, this resource is not yours to access!")
+        return redirect(url_for('showCatalog'))
+
     if request.method == 'POST':
         if request.form['name']:
             editedProduct.name = request.form['name']
@@ -398,18 +422,16 @@ def editProduct(product_name, category_name):
 
 
 # Product delete route and view
-@app.route('/category/<string:category_name>/<int:product_id>/delete/',
+@app.route('/category/<string:category_name>/<string:product_name>/delete/',
            methods=['GET', 'POST'])
 @login_required
-def deleteProduct(product_id, category_name):
+def deleteProduct(product_name, category_name):
+    product_id = request.args.get('product_id')
     productToDelete = session.query(Product).filter_by(id=product_id).one()
 
     if login_session['user_id'] != productToDelete.user_id:
-        return '''
-                <script>function myFunction()
-                {alert('You are not authorized to this product.');}
-                </script><body onload='myFunction()''>
-               '''
+        flash("Oops, this resource is not yours to access!")
+        return redirect(url_for('showCatalog'))
 
     if request.method == 'POST':
         session.delete(productToDelete)

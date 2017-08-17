@@ -83,6 +83,7 @@
             </a></em></small>
             <small class="p-1"><em><a href='{{url_for('deleteProduct',
                       product_id = product.id,
+                      product_name = product.name,
                       category_name = product.category.name,
                       user_id = product.user_id)}}'>
                       delete
