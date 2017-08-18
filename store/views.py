@@ -299,7 +299,7 @@ def newCategory():
         newCategory = Category(name=request.form['name'],
                                user_id=request.args['user_id'])
         if newCategory.name == "":
-            flash("Silly, you can't add a blank category")
+            flash("Hold your horses, this category needs a name!")
             return redirect(url_for('newCategory'))
         else:
             session.add(newCategory)
@@ -378,7 +378,7 @@ def newProduct():
                              category_id=request.form['category_id'],
                              user_id=request.args['user_id'])
         if newProduct.name == "":
-            flash("Silly, you can't add a blank product")
+            flash("Hey now, that's not fair. This product deserves a name too!")
             return redirect(url_for('newProduct'))
         else:
             session.add(newProduct)
@@ -401,7 +401,7 @@ def editProduct(product_name, category_name):
     editedProduct = session.query(Product).filter_by(id=product_id).one()
 
     if login_session['user_id'] != editedProduct.user_id:
-        flash("Oops, this resource is not yours to access!")
+        flash("Cool your jets, this product belongs to another shopper.")
         return redirect(url_for('showCatalog'))
 
     if request.method == 'POST':
@@ -431,11 +431,14 @@ def editProduct(product_name, category_name):
            methods=['GET', 'POST'])
 @login_required
 def deleteProduct(product_name, category_name):
+    # Get ids for query to prevent against duplicate name errors
     product_id = request.args.get('product_id')
     productToDelete = session.query(Product).filter_by(id=product_id).one()
+    category_id = productToDelete.category.id
+    category = session.query(Category).filter_by(id=category_id).one()
 
     if login_session['user_id'] != productToDelete.user_id:
-        flash("Oops, this resource is not yours to access!")
+        flash("Just what are you trying to pull? ;) this product is not yours!")
         return redirect(url_for('showCatalog'))
 
     if request.method == 'POST':
@@ -444,7 +447,8 @@ def deleteProduct(product_name, category_name):
         flash('"%s" Product Deleted' % productToDelete.name)
         return redirect(url_for('showCatalog'))
     else:
-        return render_template('delete-product.html', product=productToDelete)
+        return render_template('delete-product.html', product=productToDelete,
+                                                      category=category)
 
 
 # ==============================
